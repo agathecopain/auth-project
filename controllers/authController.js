@@ -11,8 +11,9 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 export async function register(req, res) {
   try {
-    const { name, lastname, email, password, confirmPassword, role, avatar } =
-      req.body;
+    const { name, lastname, email, password, confirmPassword } =
+      req.validatedBody;
+    const { role, avatar } = req.body;
 
     if (!name || !lastname || !email || !password || !confirmPassword) {
       return res
