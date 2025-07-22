@@ -215,3 +215,8 @@ server.js : point d’entrée express, initialise middleware, routes, connexion 
 
 
     1. Installer node-cron (si ce n’est pas fait)
+
+
+    database user Atlas :
+    username : agatheboncompain
+    password : ENyVIGoKcqWE7xeC
