@@ -4,6 +4,6 @@ export const validate = (schema) => (req, res, next) => {
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
-  req.validatedBody = value;
+
   next();
 };

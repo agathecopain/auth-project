@@ -7,6 +7,8 @@ import deleteUserCron from "./middlewares/deleteUser.js";
 import auditDependencies from "./middlewares/auditDependencies.js";
 import helmet from "helmet";
 import cors from "cors";
+import { authlimiter } from "./middlewares/rateLimiter.js";
+
 dotenv.config();
 
 const app = express();
@@ -22,7 +24,8 @@ app.use(cors());
 deleteUserCron.start();
 auditDependencies.start();
 
-app.use("/api/auth", authRoutes);
+app.use(authlimiter);
+app.use("/api/auth", /*authlimiter*/ authRoutes);
 
 const PORT = process.env.PORT || 5000;
 

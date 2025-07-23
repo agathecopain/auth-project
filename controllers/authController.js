@@ -11,9 +11,9 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 export async function register(req, res) {
   try {
-    const { name, lastname, email, password, confirmPassword } =
-      req.validatedBody;
-    const { role, avatar } = req.body;
+    const { name, lastname, email, password, confirmPassword, role, avatar } =
+      req.body;
+    //console.log(name, lastname, email, password, confirmPassword, role, avatar);
 
     if (!name || !lastname || !email || !password || !confirmPassword) {
       return res
@@ -225,5 +225,44 @@ export async function resetPassword(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur." });
+  }
+}
+
+//Revoyer le lien de validation si le token est expriré
+
+export async function resendVerificationEmail(req, res) {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable." });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Ce compte est déjà vérifié." });
+    }
+
+    const verificationToken = jwt.sign({ id: user._id }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    const verificationUrl = `${CLIENT_URL}/api/auth/verify/${verificationToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Nouveau lien de vérification",
+      html: `Bonjour ${user.name},<br><br>Voici un nouveau lien pour vérifier votre compte : <a href="${verificationUrl}">Vérifier mon compte</a><br><br>Ce lien est valable 24h.`,
+    });
+
+    res.json({
+      message: "Un nouveau lien de vérification a été envoyé à votre email.",
+    });
+  } catch (error) {
+    console.error("Erreur lors du renvoi de l’email :", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de l’envoi du lien de vérification." });
   }
 }
